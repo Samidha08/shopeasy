@@ -17,6 +17,8 @@ import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routePaths';
 import { LoginPage, RegisterPage } from '../features/auth';
 import { CartPage } from '../features/cart';
+import { CheckoutPage } from '../features/checkout';
+import { OrderConfirmationPage, OrderHistoryPage } from '../features/orders';
 import { WishlistPage } from '../features/wishlist';
 
 const MainLayout = lazy(() =>
@@ -227,18 +229,6 @@ function HomePage() {
       </section>
     </div>
   );
-}
-
-function CheckoutPage() {
-  return <RoutePlaceholder title="Checkout Page" />;
-}
-
-function OrderConfirmationPage() {
-  return <RoutePlaceholder title="Order Confirmation Page" />;
-}
-
-function OrderHistoryPage() {
-  return <RoutePlaceholder title="Order History Page" />;
 }
 
 function NotFoundPage() {

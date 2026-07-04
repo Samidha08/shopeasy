@@ -3,9 +3,8 @@ import { baseApi } from './baseApi';
 import commonReducer from './common/commonSlice';
 import authReducer from '../features/auth/authSlice';
 import cartReducer from '../features/cart/cartSlice';
+import ordersReducer from '../features/orders/ordersSlice';
 import wishlistReducer from '../features/wishlist/wishlistSlice';
-
-const createPlaceholderReducer = () => (state = {}) => state;
 
 const rootReducer = combineReducers({
   common: commonReducer,
@@ -13,7 +12,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   cart: cartReducer,
   wishlist: wishlistReducer,
-  orders: createPlaceholderReducer(),
+  orders: ordersReducer,
 });
 
 export default rootReducer;

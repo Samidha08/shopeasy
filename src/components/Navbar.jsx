@@ -47,6 +47,9 @@ function Navbar() {
         </button>
         {isAuthenticated ? (
           <>
+            <Link className="navbar__action" to={ROUTES.ORDER_HISTORY}>
+              Orders
+            </Link>
             <span className="navbar__user">{user?.firstName || user?.username}</span>
             <button
               type="button"

@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { removeFromCart, updateQuantity } from './cartSlice';
+import { formatCurrency } from '../../utils/currency';
 
 function CartItem({ item, compact = false }) {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ function CartItem({ item, compact = false }) {
       <div className="cart-item__content">
         <div className="cart-item__details">
           <h3 className="cart-item__title">{item.title}</h3>
-          <p className="cart-item__price">${item.price}</p>
+          <p className="cart-item__price">{formatCurrency(item.price)}</p>
         </div>
 
         <div className="cart-item__footer">
@@ -58,7 +59,7 @@ function CartItem({ item, compact = false }) {
           </div>
 
           <span className="cart-item__subtotal">
-            ${(item.price * item.quantity).toFixed(2)}
+            {formatCurrency(item.price * item.quantity)}
           </span>
         </div>
       </div>

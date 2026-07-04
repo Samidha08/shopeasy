@@ -8,6 +8,11 @@ import {
   addToWishlist,
   selectIsProductWishlisted,
 } from '../wishlist/wishlistSlice';
+import {
+  formatUsdAsInr,
+  convertUsdToInr,
+} from '../../utils/currency';
+
 
 function formatCategoryName(categoryName) {
   return categoryName
@@ -79,7 +84,7 @@ function ProductDetailPage() {
       addToCart({
         id: product.id,
         title: product.title,
-        price: product.price,
+        price: convertUsdToInr(product.price),
         thumbnail: product.thumbnail,
         discountPercentage: product.discountPercentage,
         category: product.category,
@@ -105,7 +110,7 @@ function ProductDetailPage() {
       addToWishlist({
         id: product.id,
         title: product.title,
-        price: product.price,
+        price: convertUsdToInr(product.price),
         thumbnail: product.thumbnail,
         discountPercentage: product.discountPercentage,
         category: product.category,
@@ -171,7 +176,9 @@ function ProductDetailPage() {
         <div className="product-detail__highlights">
           <div className="product-detail__price-block">
             <span className="product-detail__price-label">Price</span>
-            <strong className="product-detail__price">${product.price}</strong>
+            <strong className="product-detail__price">
+              {formatUsdAsInr(product.price)}
+            </strong>
           </div>
           <div className="product-detail__rating-block">
             <span className="product-detail__rating">Rating {product.rating}</span>

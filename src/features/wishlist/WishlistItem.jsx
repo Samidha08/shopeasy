@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { addToCart } from '../cart/cartSlice';
 import { productDetail } from '../../routes/routePaths';
 import { removeFromWishlist } from './wishlistSlice';
+import { formatCurrency } from '../../utils/currency';
 
 function formatCategoryName(categoryName = '') {
   return categoryName
@@ -53,7 +54,9 @@ function WishlistItem({ item }) {
             {item.title}
           </Link>
           <div className="wishlist-item__meta">
-            <span className="wishlist-item__price">${item.price}</span>
+            <span className="wishlist-item__price">
+              {formatCurrency(item.price)}
+            </span>
             {item.rating ? (
               <span className="wishlist-item__rating">Rating {item.rating}</span>
             ) : null}

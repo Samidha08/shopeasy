@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import CartItem from './CartItem';
 import { clearCart, selectCartItems, selectCartSummary } from './cartSlice';
 import { ROUTES } from '../../routes/routePaths';
+import { formatCurrency } from '../../utils/currency';
 
 function CartSummary() {
   const summary = useSelector(selectCartSummary);
@@ -19,15 +20,15 @@ function CartSummary() {
         </div>
         <div className="cart-summary__row">
           <span>Subtotal</span>
-          <strong>${summary.subtotal.toFixed(2)}</strong>
+          <strong>{formatCurrency(summary.subtotal)}</strong>
         </div>
         <div className="cart-summary__row">
           <span>Total discount</span>
-          <strong>-${summary.totalDiscount.toFixed(2)}</strong>
+          <strong>-{formatCurrency(summary.totalDiscount)}</strong>
         </div>
         <div className="cart-summary__row cart-summary__row--final">
           <span>Final total</span>
-          <strong>${summary.finalTotal.toFixed(2)}</strong>
+          <strong>{formatCurrency(summary.finalTotal)}</strong>
         </div>
       </div>
 

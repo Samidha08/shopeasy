@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { productDetail } from '../../routes/routePaths';
+import { formatUsdAsInr } from '../../utils/currency';
 
 function formatCategoryName(categoryName) {
   return categoryName
@@ -28,7 +29,9 @@ function ProductCard({ product }) {
         </span>
         <h3 className="product-card__title">{product.title}</h3>
         <div className="product-card__meta">
-          <span className="product-card__price">${product.price}</span>
+          <span className="product-card__price">
+            {formatUsdAsInr(product.price)}
+          </span>
           <span className="product-card__rating">Rating {product.rating}</span>
         </div>
       </div>
