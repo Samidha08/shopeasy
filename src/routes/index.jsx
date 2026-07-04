@@ -15,6 +15,7 @@ import {
 } from '../features/products';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routePaths';
+import { CartPage } from '../features/cart';
 
 const MainLayout = lazy(() =>
   import('../layouts/MainLayout').then((module) => ({
@@ -224,10 +225,6 @@ function HomePage() {
       </section>
     </div>
   );
-}
-
-function CartPage() {
-  return <RoutePlaceholder title="Cart Page" />;
 }
 
 function WishlistPage() {
