@@ -15,7 +15,9 @@ import {
 } from '../features/products';
 import ProtectedRoute from './ProtectedRoute';
 import { ROUTES } from './routePaths';
+import { LoginPage, RegisterPage } from '../features/auth';
 import { CartPage } from '../features/cart';
+import { WishlistPage } from '../features/wishlist';
 
 const MainLayout = lazy(() =>
   import('../layouts/MainLayout').then((module) => ({
@@ -227,10 +229,6 @@ function HomePage() {
   );
 }
 
-function WishlistPage() {
-  return <RoutePlaceholder title="Wishlist Page" />;
-}
-
 function CheckoutPage() {
   return <RoutePlaceholder title="Checkout Page" />;
 }
@@ -241,14 +239,6 @@ function OrderConfirmationPage() {
 
 function OrderHistoryPage() {
   return <RoutePlaceholder title="Order History Page" />;
-}
-
-function LoginPage() {
-  return <RoutePlaceholder title="Login Page" />;
-}
-
-function RegisterPage() {
-  return <RoutePlaceholder title="Register Page" />;
 }
 
 function NotFoundPage() {

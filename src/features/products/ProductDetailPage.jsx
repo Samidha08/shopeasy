@@ -1,9 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useGetProductByIdQuery } from './productsApi';
 import { addToCart } from '../cart/cartSlice';
+import {
+  addToWishlist,
+  selectIsProductWishlisted,
+} from '../wishlist/wishlistSlice';
 
 function formatCategoryName(categoryName) {
   return categoryName
@@ -42,6 +46,7 @@ function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { data: product, isLoading, isError, refetch } = useGetProductByIdQuery(id);
+  const isWishlisted = useSelector(selectIsProductWishlisted(id));
 
   const images = useMemo(() => {
     if (!product) {
@@ -91,7 +96,25 @@ function ProductDetailPage() {
       return;
     }
 
-    toast.info(`${product.title} added to wishlist.`);
+    if (isWishlisted) {
+      toast.info(`${product.title} is already in your wishlist.`);
+      return;
+    }
+
+    dispatch(
+      addToWishlist({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        thumbnail: product.thumbnail,
+        discountPercentage: product.discountPercentage,
+        category: product.category,
+        brand: product.brand,
+        stock: product.stock,
+        rating: product.rating,
+      })
+    );
+    toast.success(`${product.title} added to wishlist.`);
   };
 
   if (isLoading) {
@@ -208,7 +231,7 @@ function ProductDetailPage() {
               className="secondary-button"
               onClick={handleAddToWishlist}
             >
-              Add to Wishlist
+              {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
             </button>
           </div>
         </div>
