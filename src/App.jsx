@@ -1,6 +1,13 @@
+import { Provider } from 'react-redux';
+import AppRoutes from './routes';
+import { store } from './stores/store';
 
 function App() {
-  return <h1>ShopEasy</h1>;
+  return (
+    <Provider store={store}>
+      <AppRoutes />
+    </Provider>
+  );
 }
 
 export default App;

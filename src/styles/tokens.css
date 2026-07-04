@@ -1,1 +1,32 @@
-// Placeholder module.
+:root {
+  --color-primary: #5680e9;
+  --color-primary-hover: #4a6fd3;
+  --color-secondary: #8860d0;
+  --color-accent: #5ab9ea;
+  --color-accent-light: #84ceeb;
+  --color-soft-lavender: #c1c8e4;
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-text: #2d3748;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-link: var(--color-primary);
+  --color-link-hover: var(--color-primary-hover);
+  --color-badge: var(--color-accent-light);
+  --color-badge-text: var(--color-primary);
+  --color-focus-ring: rgba(86, 128, 233, 0.28);
+  --shadow-soft: 0 10px 30px rgba(45, 55, 72, 0.08);
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --max-width: 1200px;
+  --font-body: 'Segoe UI', sans-serif;
+}

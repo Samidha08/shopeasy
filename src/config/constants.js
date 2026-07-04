@@ -1,4 +1,4 @@
-import env from './env';
+// import env from './env';
 
 export const APP_NAME = 'ShopEasy';
 export const PAGINATION_LIMIT = 12;
