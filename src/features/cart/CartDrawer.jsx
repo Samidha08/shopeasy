@@ -4,10 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import CartItem from './CartItem';
 import { CartSummaryPanel } from './CartPage';
 import { selectCartItems } from './cartSlice';
-import {
-  closeCartDrawer,
-  toggleCartDrawer,
-} from '../../stores/common/commonSlice';
+import { closeCartDrawer } from '../../stores/common/commonSlice';
 import { ROUTES } from '../../routes/routePaths';
 
 function CartDrawer() {
@@ -25,7 +22,7 @@ function CartDrawer() {
   }
 
   return (
-    <div className="cart-drawer" aria-modal="true" role="dialog">
+    <div className="cart-drawer" aria-modal="true" role="dialog" aria-label="Shopping cart">
       <button
         type="button"
         className="cart-drawer__backdrop"
@@ -44,7 +41,7 @@ function CartDrawer() {
             type="button"
             className="cart-drawer__close"
             aria-label="Close cart drawer"
-            onClick={() => dispatch(toggleCartDrawer())}
+            onClick={() => dispatch(closeCartDrawer())}
           >
             ×
           </button>
@@ -56,7 +53,7 @@ function CartDrawer() {
             <p className="empty-state__description">
               Add products to your cart to see them here.
             </p>
-            <Link className="primary-button" to={ROUTES.PRODUCTS}>
+            <Link className="primary-button" to={ROUTES.PRODUCTS} onClick={() => dispatch(closeCartDrawer())}>
               Continue Shopping
             </Link>
           </div>
@@ -70,7 +67,7 @@ function CartDrawer() {
 
             <div className="cart-drawer__footer">
               <CartSummaryPanel />
-              <Link className="secondary-button cart-summary__button" to={ROUTES.CART}>
+              <Link className="secondary-button cart-summary__button" to={ROUTES.CART} onClick={() => dispatch(closeCartDrawer())}>
                 View Full Cart
               </Link>
             </div>

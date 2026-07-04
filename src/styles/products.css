@@ -39,6 +39,12 @@
   line-height: 1.7;
 }
 
+.products-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .products-page__category-pill {
   display: inline-flex;
   width: fit-content;
@@ -46,6 +52,104 @@
   border-radius: 999px;
   background-color: var(--color-badge);
   color: var(--color-badge-text);
+  font-weight: 600;
+}
+
+.products-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-bar__label,
+.sort-dropdown__label {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.filter-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filter-chip,
+.sort-dropdown__select,
+.pagination__button {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.filter-chip {
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-chip:hover,
+.filter-chip--active {
+  border-color: var(--color-accent);
+  color: var(--color-primary);
+  background-color: var(--color-surface-muted);
+}
+
+.filter-chip--active {
+  font-weight: 700;
+}
+
+.sort-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sort-dropdown__select {
+  min-width: 220px;
+  padding: 0.7rem 0.95rem;
+}
+
+.products-page__results {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.pagination__button {
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+}
+
+.pagination__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination__status {
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 

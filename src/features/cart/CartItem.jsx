@@ -36,7 +36,7 @@ function CartItem({ item, compact = false }) {
       <div className="cart-item__content">
         <div className="cart-item__details">
           <h3 className="cart-item__title">{item.title}</h3>
-          <p className="cart-item__price">{formatCurrency(item.price)}</p>
+          <p className="cart-item__price">Per item: {formatCurrency(item.price)}</p>
         </div>
 
         <div className="cart-item__footer">
@@ -59,7 +59,7 @@ function CartItem({ item, compact = false }) {
           </div>
 
           <span className="cart-item__subtotal">
-            {formatCurrency(item.price * item.quantity)}
+           Total: {formatCurrency(item.price * item.quantity)}
           </span>
         </div>
       </div>

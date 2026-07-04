@@ -35,13 +35,19 @@ export const productsApi = baseApi.injectEndpoints({
     getProducts: builder.query({
       query: (category) => {
         if (category) {
-          return `/products/category/${category}`;
+          return {
+            url: `/products/category/${category}`,
+            params: {
+              limit: 100,
+              skip: 0,
+            },
+          };
         }
 
         return {
           url: '/products',
           params: {
-            limit: 0,
+            limit: 100,
             skip: 0,
           },
         };
