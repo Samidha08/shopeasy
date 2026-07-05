@@ -10,6 +10,10 @@ function formatCategoryName(categoryName) {
 }
 
 function ProductCard({ product }) {
+  if (!product || product.id === undefined || product.id === null) {
+    return null;
+  }
+
   return (
     <Link className="product-card" to={productDetail(product.id)}>
       <div className="product-card__image-wrap">

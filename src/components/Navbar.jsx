@@ -20,6 +20,7 @@ function Navbar() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectAuthUser);
   const searchWrapRef = useRef(null);
+  const suppressSearchNavigationRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.search).get('search') || ''
   );
@@ -79,13 +80,23 @@ function Navbar() {
   };
 
   const navigateToProduct = (productId) => {
+    suppressSearchNavigationRef.current = true;
+    setSearchTerm('');
     navigate(productDetail(productId));
     closeSearchDropdown();
   };
 
   useEffect(() => {
+    if (suppressSearchNavigationRef.current && location.pathname !== ROUTES.PRODUCTS) {
+      suppressSearchNavigationRef.current = false;
+      return;
+    }
+
     if (location.pathname !== ROUTES.PRODUCTS) {
       if (debouncedSearch.trim()) {
+        if (!isSearchOpen) {
+          return;
+        }
         navigate(`${ROUTES.PRODUCTS}?search=${encodeURIComponent(debouncedSearch.trim())}&page=1`);
         scrollProductsToResults();
       }
@@ -108,7 +119,7 @@ function Navbar() {
         scrollProductsToResults();
       }
     }
-  }, [debouncedSearch, location.pathname, location.search, navigate]);
+  }, [debouncedSearch, isSearchOpen, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -245,7 +256,10 @@ function Navbar() {
                           ? 'navbar-search-suggestion navbar-search-suggestion--active'
                           : 'navbar-search-suggestion'
                       }
-                      onClick={() => navigateToProduct(product.id)}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        navigateToProduct(product.id);
+                      }}
                       onMouseEnter={() => setHighlightedIndex(index)}
                       role="option"
                       aria-selected={highlightedIndex === index}
@@ -273,7 +287,10 @@ function Navbar() {
                     ? 'navbar-search-dropdown__view-all navbar-search-dropdown__view-all--active'
                     : 'navbar-search-dropdown__view-all'
                 }
-                onClick={navigateToSearchResults}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  navigateToSearchResults();
+                }}
                 onMouseEnter={() => setHighlightedIndex(limitedSuggestions.length)}
               >
                 View all results for &quot;{trimmedSearch}&quot;

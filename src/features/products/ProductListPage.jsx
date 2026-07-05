@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import FilterBar from './FilterBar';
@@ -55,7 +55,6 @@ function ProductListPage() {
   const sortValue = params.get('sort') || '';
   const pageValue = Number(params.get('page') || '1');
   const currentPage = Number.isNaN(pageValue) || pageValue < 1 ? 1 : pageValue;
-  const [localPage, setLocalPage] = useState(currentPage);
   const {
     data: products = [],
     isLoading,
@@ -65,10 +64,6 @@ function ProductListPage() {
   const {
     data: categories = [],
   } = useGetCategoriesQuery();
-
-  useEffect(() => {
-    setLocalPage(currentPage);
-  }, [currentPage]);
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -125,12 +120,10 @@ function ProductListPage() {
   };
 
   const handleCategoryChange = (nextCategory) => {
-    setLocalPage(1);
     updateQueryParams({ category: nextCategory, page: 1 });
   };
 
   const handleSortChange = (nextSort) => {
-    setLocalPage(1);
     updateQueryParams({ sort: nextSort, page: 1 });
   };
 
@@ -139,7 +132,6 @@ function ProductListPage() {
       return;
     }
 
-    setLocalPage(nextPage);
     updateQueryParams({ page: nextPage });
   };
 
@@ -200,7 +192,7 @@ function ProductListPage() {
             ))}
           </div>
           <Pagination
-            page={localPage}
+            page={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
           />
