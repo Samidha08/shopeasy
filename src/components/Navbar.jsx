@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -7,7 +7,8 @@ import { toggleCartDrawer } from '../stores/common/commonSlice';
 import { selectCartSummary } from '../features/cart/cartSlice';
 import { selectAuthUser, selectIsAuthenticated } from '../features/auth';
 import { selectWishlistCount } from '../features/wishlist';
-import { ROUTES } from '../routes/routePaths';
+import { useSearchProductsQuery } from '../features/products';
+import { ROUTES, productDetail } from '../routes/routePaths';
 import useDebounce from '../hooks/useDebounce';
 
 function Navbar() {
@@ -18,13 +19,27 @@ function Navbar() {
   const wishlistCount = useSelector(selectWishlistCount);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectAuthUser);
+  const searchWrapRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState(
     () => new URLSearchParams(location.search).get('search') || ''
   );
   const [isScrolled, setIsScrolled] = useState(
     () => typeof window !== 'undefined' && window.scrollY > 8
   );
-  const debouncedSearch = useDebounce(searchTerm, 500);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const debouncedSearch = useDebounce(searchTerm, 300);
+  const trimmedSearch = searchTerm.trim();
+  const debouncedSuggestionSearch = debouncedSearch.trim();
+  const shouldFetchSuggestions = debouncedSuggestionSearch.length > 0;
+  const {
+    data: suggestions = [],
+    isFetching: isSuggestionsLoading,
+  } = useSearchProductsQuery(debouncedSuggestionSearch, {
+    skip: !isSearchOpen || !shouldFetchSuggestions,
+  });
+  const limitedSuggestions = suggestions.slice(0, 6);
+  const canShowDropdown = isSearchOpen && trimmedSearch.length > 0;
 
   const handleLogout = () => {
     dispatch(logoutAndClear());
@@ -32,10 +47,47 @@ function Navbar() {
     navigate(ROUTES.HOME);
   };
 
+  const closeSearchDropdown = () => {
+    setIsSearchOpen(false);
+    setHighlightedIndex(-1);
+  };
+
+  const scrollProductsToResults = () => {
+    window.setTimeout(() => {
+      const resultsElement =
+        document.querySelector('.products-page__results') ||
+        document.querySelector('.products-page');
+
+      resultsElement?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 160);
+  };
+
+  const navigateToSearchResults = () => {
+    const nextSearch = trimmedSearch;
+
+    if (!nextSearch) {
+      closeSearchDropdown();
+      return;
+    }
+
+    navigate(`${ROUTES.PRODUCTS}?search=${encodeURIComponent(nextSearch)}&page=1`);
+    closeSearchDropdown();
+    scrollProductsToResults();
+  };
+
+  const navigateToProduct = (productId) => {
+    navigate(productDetail(productId));
+    closeSearchDropdown();
+  };
+
   useEffect(() => {
     if (location.pathname !== ROUTES.PRODUCTS) {
       if (debouncedSearch.trim()) {
         navigate(`${ROUTES.PRODUCTS}?search=${encodeURIComponent(debouncedSearch.trim())}&page=1`);
+        scrollProductsToResults();
       }
       return;
     }
@@ -52,6 +104,9 @@ function Navbar() {
       params.set('page', '1');
       const nextSearch = params.toString();
       navigate(`${ROUTES.PRODUCTS}${nextSearch ? `?${nextSearch}` : ''}`);
+      if (debouncedSearch.trim()) {
+        scrollProductsToResults();
+      }
     }
   }, [debouncedSearch, location.pathname, location.search, navigate]);
 
@@ -65,6 +120,74 @@ function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (
+        searchWrapRef.current &&
+        !searchWrapRef.current.contains(event.target)
+      ) {
+        closeSearchDropdown();
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, []);
+
+  const handleSearchChange = (event) => {
+    const nextValue = event.target.value;
+
+    setSearchTerm(nextValue);
+    setHighlightedIndex(-1);
+    setIsSearchOpen(nextValue.trim().length > 0);
+
+    if (!nextValue.trim()) {
+      closeSearchDropdown();
+    }
+  };
+
+  const handleSearchKeyDown = (event) => {
+    const viewAllIndex = limitedSuggestions.length;
+    const maxIndex = canShowDropdown ? viewAllIndex : -1;
+
+    if (event.key === 'Escape') {
+      closeSearchDropdown();
+      return;
+    }
+
+    if (event.key === 'ArrowDown' && canShowDropdown) {
+      event.preventDefault();
+      setHighlightedIndex((currentIndex) =>
+        currentIndex >= maxIndex ? 0 : currentIndex + 1
+      );
+      return;
+    }
+
+    if (event.key === 'ArrowUp' && canShowDropdown) {
+      event.preventDefault();
+      setHighlightedIndex((currentIndex) =>
+        currentIndex <= 0 ? maxIndex : currentIndex - 1
+      );
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+
+      if (
+        canShowDropdown &&
+        highlightedIndex >= 0 &&
+        highlightedIndex < limitedSuggestions.length
+      ) {
+        navigateToProduct(limitedSuggestions[highlightedIndex].id);
+        return;
+      }
+
+      navigateToSearchResults();
+    }
+  };
+
   return (
     <header className={isScrolled ? 'navbar-shell navbar-shell--scrolled' : 'navbar-shell'}>
       <div className="navbar-strip">
@@ -77,16 +200,86 @@ function Navbar() {
           <span>ShopEasy</span>
         </Link>
 
-        <div className="navbar__search-wrap">
+        <div className="navbar__search-wrap" ref={searchWrapRef}>
           <input
             className="navbar__search"
             type="search"
             aria-label="Search products"
             placeholder="Search for products..."
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onChange={handleSearchChange}
+            onFocus={() => setIsSearchOpen(trimmedSearch.length > 0)}
+            onKeyDown={handleSearchKeyDown}
+            aria-expanded={canShowDropdown}
+            aria-controls="navbar-search-suggestions"
+            aria-autocomplete="list"
           />
           <span className="navbar__search-icon" aria-hidden="true" />
+
+          {canShowDropdown ? (
+            <div
+              className="navbar-search-dropdown"
+              id="navbar-search-suggestions"
+              role="listbox"
+            >
+              {isSuggestionsLoading ? (
+                <div className="navbar-search-dropdown__state">
+                  Searching products...
+                </div>
+              ) : null}
+
+              {!isSuggestionsLoading && limitedSuggestions.length === 0 ? (
+                <div className="navbar-search-dropdown__state">
+                  No products found
+                </div>
+              ) : null}
+
+              {!isSuggestionsLoading && limitedSuggestions.length > 0 ? (
+                <div className="navbar-search-dropdown__list">
+                  {limitedSuggestions.map((product, index) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      className={
+                        highlightedIndex === index
+                          ? 'navbar-search-suggestion navbar-search-suggestion--active'
+                          : 'navbar-search-suggestion'
+                      }
+                      onClick={() => navigateToProduct(product.id)}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      role="option"
+                      aria-selected={highlightedIndex === index}
+                    >
+                      <img
+                        className="navbar-search-suggestion__image"
+                        src={product.thumbnail}
+                        alt=""
+                        aria-hidden="true"
+                      />
+                      <span className="navbar-search-suggestion__content">
+                        <span className="navbar-search-suggestion__title">
+                          {product.title}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              <button
+                type="button"
+                className={
+                  highlightedIndex === limitedSuggestions.length
+                    ? 'navbar-search-dropdown__view-all navbar-search-dropdown__view-all--active'
+                    : 'navbar-search-dropdown__view-all'
+                }
+                onClick={navigateToSearchResults}
+                onMouseEnter={() => setHighlightedIndex(limitedSuggestions.length)}
+              >
+                View all results for &quot;{trimmedSearch}&quot;
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <nav className="navbar__links" aria-label="Store">
@@ -95,9 +288,6 @@ function Navbar() {
           </Link>
           <Link className="navbar__link" to={`${ROUTES.PRODUCTS}?sort=discount`}>
             Deals
-          </Link>
-          <Link className="navbar__link" to={`${ROUTES.PRODUCTS}?sort=new`}>
-            New Arrivals
           </Link>
           <Link className="navbar__link" to={`${ROUTES.PRODUCTS}?sort=rating`}>
             Best Sellers

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import {
   BrowserRouter,
   Outlet,
@@ -20,6 +20,7 @@ import { CartPage } from '../features/cart';
 import { CheckoutPage } from '../features/checkout';
 import { OrderConfirmationPage, OrderHistoryPage } from '../features/orders';
 import { WishlistPage } from '../features/wishlist';
+import { toast } from 'react-toastify';
 
 const MainLayout = lazy(() =>
   import('../layouts/MainLayout').then((module) => ({
@@ -32,7 +33,38 @@ function FallbackMainLayout() {
 }
 
 function RoutePlaceholder({ title }) {
-  return <div>{title}</div>;
+  if (title === 'Loading...') {
+    return (
+      <div className="route-placeholder" aria-label="Loading content">
+        <div className="route-placeholder__navbar shimmer" />
+        <div className="route-placeholder__hero">
+          <div className="route-placeholder__hero-content">
+            <div className="route-placeholder__line shimmer shimmer--short" />
+            <div className="route-placeholder__line shimmer" />
+            <div className="route-placeholder__line shimmer" />
+            <div className="route-placeholder__actions">
+              <div className="route-placeholder__button shimmer" />
+              <div className="route-placeholder__button shimmer" />
+            </div>
+          </div>
+          <div className="route-placeholder__panel">
+            <div className="route-placeholder__block shimmer" />
+            <div className="route-placeholder__block shimmer" />
+          </div>
+        </div>
+        <div className="route-placeholder__section">
+          <div className="route-placeholder__line shimmer shimmer--short" />
+          <div className="route-placeholder__grid">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="route-placeholder__card shimmer" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <div className="route-placeholder route-placeholder--fallback">{title}</div>;
 }
 
 const benefitHighlights = [
@@ -96,11 +128,38 @@ function SectionHeader({ eyebrow, title, description }) {
   );
 }
 
-function LoadingCards({ count, className }) {
+function LoadingCards({ count, className, variant = 'card' }) {
   return (
     <div className={className}>
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="loading-card" aria-hidden="true" />
+        <div
+          key={index}
+          className={`loading-card loading-card--${variant}`}
+          aria-hidden="true"
+        >
+          {variant === 'product' ? (
+            <>
+              <div className="loading-card__image shimmer" />
+              <div className="loading-card__content">
+                <div className="loading-card__line shimmer shimmer--short" />
+                <div className="loading-card__line shimmer" />
+                <div className="loading-card__line shimmer shimmer--short" />
+              </div>
+            </>
+          ) : variant === 'category' ? (
+            <>
+              <div className="loading-card__image shimmer" />
+              <div className="loading-card__line shimmer shimmer--short" />
+              <div className="loading-card__line shimmer shimmer--tiny" />
+            </>
+          ) : (
+            <>
+              <div className="loading-card__line shimmer shimmer--short" />
+              <div className="loading-card__line shimmer" />
+              <div className="loading-card__line shimmer" />
+            </>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -134,6 +193,21 @@ function HomePage() {
   } = useGetFeaturedProductsQuery(8);
   const heroProducts = featuredProducts.slice(0, 4);
   const categoryCards = categories.slice(0, 8);
+  const [email, setEmail] = useState('');
+
+  const isValidEmail = (value) => /.+@.+\..+/.test(value.trim());
+
+  const handleNewsletterSubmit = (event) => {
+    event.preventDefault();
+
+    if (!isValidEmail(email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+
+    toast.success('Thankyou for subscribing');
+    setEmail('');
+  };
 
   return (
     <div className="landing-page">
@@ -213,7 +287,7 @@ function HomePage() {
         ) : null}
 
         {isCategoriesLoading ? (
-          <LoadingCards count={8} className="category-grid" />
+          <LoadingCards count={8} className="category-grid" variant="category" />
         ) : null}
 
         {isCategoriesError ? (
@@ -262,7 +336,7 @@ function HomePage() {
         />
 
         {isProductsLoading ? (
-          <LoadingCards count={8} className="product-grid" />
+          <LoadingCards count={8} className="product-grid" variant="product" />
         ) : null}
 
         {isProductsError ? (
@@ -330,14 +404,13 @@ function HomePage() {
             savings.
           </p>
         </div>
-        <form
-          className="newsletter-section__form"
-          onSubmit={(event) => event.preventDefault()}
-        >
+        <form className="newsletter-section__form" onSubmit={handleNewsletterSubmit}>
           <input
             type="email"
             aria-label="Email address"
             placeholder="Enter your email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
           <button type="submit" className="primary-button">
             Subscribe

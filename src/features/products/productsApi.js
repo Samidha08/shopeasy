@@ -55,6 +55,18 @@ export const productsApi = baseApi.injectEndpoints({
       transformResponse: (response) => response.products || [],
       providesTags: ['Products'],
     }),
+    searchProducts: builder.query({
+      query: (searchTerm) => ({
+        url: '/products/search',
+        params: {
+          q: searchTerm,
+          limit: 6,
+          skip: 0,
+        },
+      }),
+      transformResponse: (response) => response.products || [],
+      providesTags: ['Products'],
+    }),
     getProductById: builder.query({
       query: (id) => `/products/${id}`,
       providesTags: ['Products'],
@@ -66,5 +78,6 @@ export const {
   useGetCategoriesQuery,
   useGetFeaturedProductsQuery,
   useGetProductsQuery,
+  useSearchProductsQuery,
   useGetProductByIdQuery,
 } = productsApi;
